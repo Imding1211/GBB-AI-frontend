@@ -1,5 +1,6 @@
-import { useState } from 'react';
 import { Icon } from '@iconify/react';
+import { useForm } from 'react-hook-form';
+import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import plusFill from '@iconify/icons-eva/plus-fill';
 import refreshFill from '@iconify/icons-eva/refresh-fill';
@@ -61,6 +62,18 @@ export default function KbDetailsPage() {
 
   const { kbMeta, isLoading } = useFetchKbMeta(id, refreshKey);
 
+    const methods = useForm({
+    defaultValues: kbMeta,
+  });
+
+  const { reset } = methods;
+
+  useEffect(() => {
+    if (kbMeta) {
+      reset(kbMeta);
+    }
+  }, [kbMeta, reset]);
+
   const handleRefresh = () => {
     setRefreshKey(Math.floor(Math.random() * 1000));
   };
@@ -112,7 +125,7 @@ export default function KbDetailsPage() {
             />
 
             <Stack spacing={2}>
-              <KbDetailsTable kb={kbMeta} />
+              <KbDetailsTable kb={kbMeta} methods={methods} />
 
               {/* {kbMeta.type.toLowerCase() === 'qa' && <QaDataTable />} */}
 

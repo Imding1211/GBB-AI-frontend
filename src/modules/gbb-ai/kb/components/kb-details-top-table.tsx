@@ -74,11 +74,19 @@ const TableRowStyle = styled(TableCell)(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-type Props = { kb: IDataset };
+type Props = {
+  kb: IDataset;
+  methods: any;
+};
 
-export default function KbDetailsTable({ kb }: Props) {
-  // const { type, createdAt, index, modifiedAt, shared, tags, size } = kb;
-  const { type, createdAt, name, modifiedAt, shared, tags, size } = kb;
+export default function KbDetailsTable({ kb, methods }: Props) {
+  const { type, createdAt, index, modifiedAt, shared, size } = kb;
+
+  const { watch, setValue } = methods;
+
+  const values = watch();
+
+  const { tags } = values as IDataset;
 
   const sidebar = useBoolean();
 
@@ -114,8 +122,7 @@ export default function KbDetailsTable({ kb }: Props) {
                 onClick={handleClick}
                 sx={{ pl: 3, color: 'text.primary', whiteSpace: 'nowrap', fontWeight: '600' }}
               >
-                {/* {index || 'N/A'} */}
-                {name || 'N/A'}
+                {index || 'N/A'}
               </TableRowStyle>
               <TableRowStyle sx={{ pl: 1 }}>
                 {!!type && (
@@ -140,18 +147,24 @@ export default function KbDetailsTable({ kb }: Props) {
                 onClick={handleClick}
                 sx={{ color: 'text.primary', whiteSpace: 'nowrap', maxWidth: 180 }}
               >
-                {!!tags && (
+                {!!tags && tags.length > 0 && (
                   <Stack direction="row" spacing={0.5}>
-                    {tags.map((tag, _index) => (
+                    <Chip
+                      size="small"
+                      color="primary"
+                      variant="soft"
+                      label={tags[0]}
+                      sx={{ height: 23, textTransform: 'capitalize' }}
+                    />
+                    {tags.length > 1 && (
                       <Chip
-                        key={_index}
                         size="small"
-                        color="default"
+                        color="primary"
                         variant="soft"
-                        label={tag}
-                        sx={{ height: 23 }}
+                        label={`+${tags.length - 1}`}
+                        sx={{ height: 23, textTransform: 'capitalize' }}
                       />
-                    ))}
+                    )}
                   </Stack>
                 )}
               </TableRowStyle>
@@ -212,10 +225,11 @@ export default function KbDetailsTable({ kb }: Props) {
       </TableContainer>
 
       <KbDetailsSidebar
-        item={kb}
+        item={values}
         open={sidebar.value}
         onClose={sidebar.onFalse}
-        onDelete={() => {}}
+        onDelete={() => { }}
+        setValue={setValue}
       />
     </Card>
   );

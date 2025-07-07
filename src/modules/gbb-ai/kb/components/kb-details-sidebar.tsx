@@ -31,9 +31,10 @@ type Props = DrawerProps & {
   item: IDataset;
   onClose: VoidFunction;
   onDelete: VoidFunction;
+  setValue?:(name: keyof IDataset, value: any) => void;
 };
 
-export default function KbDetailsSidebar({ item, open, onClose, onDelete, ...other }: Props) {
+export default function KbDetailsSidebar({ item, open, onClose, onDelete, setValue, ...other }: Props) {
   const { name, type, index, shared, modifiedAt } = item;
 
   const hasShared = shared && !!shared.length;
@@ -46,7 +47,7 @@ export default function KbDetailsSidebar({ item, open, onClose, onDelete, ...oth
 
   const [inviteEmail, setInviteEmail] = useState('');
 
-  const [tags, setTags] = useState(item.tags.slice(0, 3));
+  const [tags, setTags] = useState((item.tags || []).slice(0, 3));
 
   const handleChangeInvite = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setInviteEmail(event.target.value);
@@ -54,7 +55,8 @@ export default function KbDetailsSidebar({ item, open, onClose, onDelete, ...oth
 
   const handleChangeTags = useCallback((newValue: string[]) => {
     setTags(newValue);
-  }, []);
+    setValue?.('tags', newValue);
+  }, [setValue]);
 
   const renderTags = (
     <Stack spacing={1.5}>
@@ -64,9 +66,9 @@ export default function KbDetailsSidebar({ item, open, onClose, onDelete, ...oth
         <Autocomplete
           multiple
           freeSolo
-          options={item.tags.map((option) => option)}
+          options={(item.tags || []).map((option) => option)}
           getOptionLabel={(option) => option}
-          defaultValue={item.tags.slice(0, 3)}
+          defaultValue={(item.tags || []).slice(0, 3)}
           value={tags}
           onChange={(event, newValue) => {
             handleChangeTags(newValue);
